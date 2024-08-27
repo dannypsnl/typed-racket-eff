@@ -1,14 +1,8 @@
 #lang racket
 (require racket/control
-         (for-syntax syntax/parse))
+         "with.rkt")
 
 (define effect-log (make-continuation-prompt-tag 'log))
-(define-syntax (with stx)
-  (syntax-parse stx
-    [(with [tag handler] body)
-     #'(call/prompt (λ () body)
-                    tag
-                    handler)]))
 
 (define (log msg)
   (call/cc (λ (k)
