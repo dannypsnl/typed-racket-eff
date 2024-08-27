@@ -10,14 +10,18 @@
              (abort/cc effect-log k msg))))
 
 (module+ main
+  (require "effect-raise.rkt")
   (define (f)
     (log 1)
     (log 2)
     (log 3)
+    (raise 'fail)
     (log 4)
     (log 5))
 
-  (with [effect-log (λ (resume v)
-                   (println v)
-                   (resume))]
-        (f)))
+  (with [effect-raise (λ (err) (printf "got error: ~a~n" err))]
+    (with [effect-log (λ (resume v)
+                        (println v)
+                        (resume))]
+      (f)))
+  )
