@@ -1,4 +1,5 @@
 #lang racket
+(provide effect-log log)
 (require racket/control
          "with.rkt")
 
@@ -8,14 +9,15 @@
   (call/cc (λ (k)
              (abort/cc effect-log k msg))))
 
-(define (f)
-  (log 1)
-  (log 2)
-  (log 3)
-  (log 4)
-  (log 5))
+(module+ main
+  (define (f)
+    (log 1)
+    (log 2)
+    (log 3)
+    (log 4)
+    (log 5))
 
-(with [effect-log (λ (resume v)
-                 (println v)
-                 (resume))]
-      (f))
+  (with [effect-log (λ (resume v)
+                   (println v)
+                   (resume))]
+        (f)))

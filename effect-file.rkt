@@ -1,4 +1,5 @@
 #lang racket
+(provide effect-file fread)
 (require racket/control
          "with.rkt")
 
@@ -7,14 +8,16 @@
 (define (fread)
   (call/cc (λ (k) (abort/cc effect-file k))))
 
-(define (f)
-  (define in (fread))
-  (println in))
+(module+ main
+  (define (f)
+    (define in (fread))
+    (println in))
 
-(define (with-file path action)
-  (define in (open-input-file	path))
-  (with [effect-file (λ (resume) (resume (read-line in)))]
-    (action))
-  (close-input-port in))
+  (define (with-file path action)
+    (define in (open-input-file	path))
+    (with [effect-file (λ (resume) (resume (read-line in)))]
+      (action))
+    (close-input-port in))
 
-(with-file "README.md" f)
+  (with-file "README.md" f)
+  )
