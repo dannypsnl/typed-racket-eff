@@ -5,13 +5,15 @@
 
 (define (f)
   (println 1)
-  (call/cc (lambda (k) (abort/cc tag k 2)))
+  (define r (call/cc (lambda (k) (abort/cc tag k 2))))
+  (println r)
   (println 3)
-  (call/cc (lambda (k) (abort/cc tag k 4)))
+  (define r2 (call/cc (lambda (k) (abort/cc tag k 4))))
+  (println r2)
   (println 5))
 
 (call/prompt f
              tag
              (lambda (resume v)
                (println v)
-               (resume)))
+               (resume 'back)))
