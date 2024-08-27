@@ -9,11 +9,11 @@
              (abort/cc effect-log k msg))))
 
 (define (f)
-  (println 1)
+  (log 1)
   (log 2)
-  (println 3)
+  (log 3)
   (log 4)
-  (println 5))
+  (log 5))
 
 (with [effect-log (λ (resume v)
                  (println v)
