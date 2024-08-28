@@ -20,8 +20,8 @@
     (log 5))
 
   (with [effect-raise (λ (err) (printf "got error: ~a~n" err))]
-    (with [effect-log (λ (resume v)
-                        (println v)
-                        (resume))]
-      (f)))
+        [effect-log (λ (resume v)
+                      (println v)
+                      (resume))]
+        (f))
   )
