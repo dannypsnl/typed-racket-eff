@@ -33,21 +33,21 @@
     (let-values ([(args matched?) (consume "build" args)])
       (let ([verbose (box #f)]
             [project (box #f)])
-        (if matched?
-            (with
-             [verbose-flag (verbose-flag-handler verbose)]
-             [arg (arg-handler project)]
-             (begin
-               (let loop ([args args])
-                 (unless (empty? args)
-                   (for ([a (list verbose-flag arg)])
-                     (match (call/cc (λ (k) (abort/cc a k args)))
-                       [#f (void)]
-                       [args (loop args)]))))
-               (when (unbox verbose)
-                 (printf "verbose mode~n"))
-               (printf "build project ~a~n" (unbox project))))
-            (resume)))))
+        (unless matched?
+          (resume))
+        (with
+         [verbose-flag (verbose-flag-handler verbose)]
+         [arg (arg-handler project)]
+         (begin
+           (let loop ([args args])
+             (unless (empty? args)
+               (for ([a (list verbose-flag arg)])
+                 (match (call/cc (λ (k) (abort/cc a k args)))
+                   [#f (void)]
+                   [args (loop args)]))))
+           (when (unbox verbose)
+             (printf "verbose mode~n"))
+           (printf "build project ~a~n" (unbox project)))))))
 
   (define version-cmd (make-continuation-prompt-tag 'version))
   (define (version-cmd-handler resume args)
