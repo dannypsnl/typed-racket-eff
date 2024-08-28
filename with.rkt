@@ -7,7 +7,7 @@
 (define-syntax (with stx)
   (syntax-parse stx
     [(with-command (~seq [tag handler] ...)
-       body)
+       body:expr)
      (define (go l)
        (match l
          [(cons h t)
