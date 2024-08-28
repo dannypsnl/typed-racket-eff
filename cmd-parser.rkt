@@ -31,10 +31,10 @@
   (define build-cmd (make-continuation-prompt-tag 'build))
   (define (build-cmd-handler resume args)
     (let-values ([(args matched?) (consume "build" args)])
+      (unless matched?
+        (resume))
       (let ([verbose (box #f)]
             [project (box #f)])
-        (unless matched?
-          (resume))
         (with
          [verbose-flag (verbose-flag-handler verbose)]
          [arg (arg-handler project)]
@@ -52,9 +52,9 @@
   (define version-cmd (make-continuation-prompt-tag 'version))
   (define (version-cmd-handler resume args)
     (let-values ([(args matched?) (consume "version" args)])
-      (if matched?
-          (printf "example v0.1.0~n")
-          (resume))))
+      (unless matched?
+        (resume))
+      (printf "example v0.1.0~n")))
 
   (define (program args)
     (define cmds (list build-cmd
