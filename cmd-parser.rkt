@@ -9,7 +9,6 @@
      (values tail #t)]
     [_  (values args #f)]))
 
-(define verbose-flag (make-continuation-prompt-tag))
 (define ((handle-flag box flag . variant-flags) resume args)
   (for ([f (cons flag variant-flags)])
     (let-values ([(args matched?) (consume f args)])
@@ -27,25 +26,32 @@
      (resume args)]
     [_ (resume #f)]))
 
+(define verbose-flag (make-continuation-prompt-tag))
+(define parallel-flag (make-continuation-prompt-tag))
+
 (define build-cmd (make-continuation-prompt-tag 'build))
 (define (handle-build-cmd resume args)
   (let-values ([(args matched?) (consume "build" args)])
     (unless matched?
       (resume))
     (let ([verbose (box #f)]
+          [parallel (box #f)]
           [project (box #f)])
       (with
        [verbose-flag (handle-flag verbose "--verbose" "-V")]
+       [parallel-flag (handle-flag parallel "-j")]
        [arg (handle-arg project)]
        (begin
          (let loop ([args args])
            (unless (empty? args)
-             (for ([a (list verbose-flag arg)])
+             (for ([a (list verbose-flag parallel-flag arg)])
                (match (call/cc (λ (k) (abort/cc a k args)))
                  [#f (void)]
                  [args (loop args)]))))
          (when (unbox verbose)
            (printf "verbose mode~n"))
+         (when (unbox parallel)
+           (printf "run in parallel~n"))
          (printf "build project ~a~n" (unbox project)))))))
 
 (define version-cmd (make-continuation-prompt-tag 'version))
@@ -68,7 +74,7 @@
         (program '("build" "hello")))
   (with [build-cmd handle-build-cmd]
         [version-cmd handle-version-cmd]
-        (program '("build" "hello" "--verbose")))
+        (program '("build" "hello" "-j" "--verbose")))
   (with [build-cmd handle-build-cmd]
         [version-cmd handle-version-cmd]
         (program '("build" "hello" "-V")))
