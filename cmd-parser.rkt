@@ -48,6 +48,8 @@
                (match (call/cc (λ (k) (abort/cc a k args)))
                  [#f (void)]
                  [args (loop args)]))))
+         (unless (unbox project)
+           (raise "must specific a project"))
          (when (unbox verbose)
            (printf "verbose mode~n"))
          (when (unbox parallel)
@@ -69,6 +71,16 @@
                (abort/cc c k args)))))
 
 (module+ main
+  (require racket/cmdline)
+
+  (command-line #:program "example"
+                #:args args
+    (with [build-cmd handle-build-cmd]
+          [version-cmd handle-version-cmd]
+          (program args)))
+  )
+
+(module+ test
   (with [build-cmd handle-build-cmd]
         [version-cmd handle-version-cmd]
         (program '("build" "hello")))
@@ -82,6 +94,3 @@
   (with [build-cmd handle-build-cmd]
         [version-cmd handle-version-cmd]
         (program '("version"))))
-
-(module+ test
-  )
