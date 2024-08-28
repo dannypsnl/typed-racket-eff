@@ -1,24 +1,6 @@
 #lang racket
 (require racket/control
-         (for-syntax syntax/parse
-                     racket/match))
-
-(define-syntax (with-command stx)
-  (syntax-parse stx
-    [(with-command (~seq [tag handler] ...)
-       body)
-     (define (go l)
-       (match l
-         [(cons h t)
-          (syntax-parse h
-            [(tag handler)
-             #`(call/prompt (λ () #,(go t))
-                            tag
-                            handler)])]
-         [_ #'body]))
-
-     (go (syntax->list #'((tag handler) ...)))]))
-
+         "with.rkt")
 
 (module+ main
   (define (consume str args)
@@ -52,11 +34,10 @@
                  (abort/cc c k args)))))
 
 
-  (with-command
-      [build-cmd build-cmd-handler]
-      [version-cmd version-cmd-handler]
-    (program '("build" "hello")))
-  (with-command
-      [build-cmd build-cmd-handler]
-      [version-cmd version-cmd-handler]
-    (program '("version"))))
+  (with [build-cmd build-cmd-handler]
+        [version-cmd version-cmd-handler]
+        (program '("build" "hello")))
+
+  (with [build-cmd build-cmd-handler]
+        [version-cmd version-cmd-handler]
+        (program '("version"))))
