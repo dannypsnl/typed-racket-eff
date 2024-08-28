@@ -13,11 +13,9 @@
 (define ((handle-flag box flag . variant-flags) resume args)
   (for ([f (cons flag variant-flags)])
     (let-values ([(args matched?) (consume f args)])
-      (if matched?
-          (begin
-            (set-box! box #t)
-            (resume args))
-          (void))))
+      (when matched?
+        (set-box! box #t)
+        (resume args))))
   (resume #f))
 
 (define arg (make-continuation-prompt-tag))
