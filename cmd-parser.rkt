@@ -26,11 +26,10 @@
      (resume args)]
     [_ (resume #f)]))
 
-(define verbose-flag (make-continuation-prompt-tag))
-(define parallel-flag (make-continuation-prompt-tag))
-
 (define build-cmd (make-continuation-prompt-tag 'build))
 (define (handle-build-cmd resume args)
+  (define verbose-flag (make-continuation-prompt-tag))
+  (define parallel-flag (make-continuation-prompt-tag))
   (let-values ([(args matched?) (consume "build" args)])
     (unless matched?
       (resume))
