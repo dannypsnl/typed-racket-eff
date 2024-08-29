@@ -71,17 +71,15 @@
                         handler)))]))
 
 
-(effect log : (-> Number Number))
+(effect log : (-> String Void))
 
 (define/eff (f [x : String]) : Void { log }
-  (println 1)
-  (println (log 2))
-  (println 3)
-  (println (log 4))
-  (println 5))
+  (log "1")
+  (log "2")
+  (log x))
 
-(with-eff [log (λ ([resume : (-> Number Void)]
-                   [v : Number]) : Void
-                 (println v)
-                 (resume 10))]
+(with-eff [log (λ ([resume : (-> Void Void)]
+                   [v : String]) : Void
+                 (printf "~a~n" v)
+                 (resume (void)))]
   (f "Hello"))
