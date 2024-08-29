@@ -29,8 +29,6 @@
            (define name #'T))
          (define name : #,(tag-type #'T)
            (make-continuation-prompt-tag 'tag)))]))
-(effect log : (-> Number Number))
-
 
 (define-syntax define/eff
   (syntax-parser
@@ -43,13 +41,6 @@
                   #`[#,e : #,sign]) #'(eff* ...)))
      #`(define ((f [x : T] ...) #,@bind*) : T_out
          body* ... body)]))
-(define/eff (f [x : String]) : Void { log }
-  (println 1)
-  (println (log 2))
-  (println 3)
-  (println (log 4))
-  (println 5))
-
 
 (define-syntax with-eff
   (syntax-parser
@@ -78,6 +69,16 @@
            (call/prompt (λ () (body wrapper))
                         tag
                         handler)))]))
+
+
+(effect log : (-> Number Number))
+
+(define/eff (f [x : String]) : Void { log }
+  (println 1)
+  (println (log 2))
+  (println 3)
+  (println (log 4))
+  (println 5))
 
 (with-eff [log (λ ([resume : (-> Number Void)]
                    [v : Number]) : Void
