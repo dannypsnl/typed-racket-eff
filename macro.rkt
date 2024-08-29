@@ -2,19 +2,35 @@
 (require (for-syntax syntax/parse
                      syntax/stx))
 
+(define-for-syntax (tag-type T)
+  (syntax-parse T
+    [(-> In ... Out)
+     #'(Prompt-Tagof Any
+                     (-> (-> Out Void) In ... Void))]))
+(define-for-syntax (resume-type T)
+  (syntax-parse T
+    [(-> In ... Out)
+     #'(-> Out Void)]))
+(define-for-syntax (in-type* T)
+  (syntax-parse T
+    [(-> In ... Out)
+     #'(In ...)]))
+(define-for-syntax (out-type T)
+  (syntax-parse T
+    [(-> In ... Out)
+     #'Out]))
+
 (define-syntax effect
   (syntax-parser
     #:datum-literals (:)
     [(_ name:id : T)
-     (syntax-parse #'T
-       [(-> In ... Out)
-        #'(begin
-            (begin-for-syntax
-              (define name #'T))
-            (define name : (Prompt-Tagof Any
-                                         (-> (-> Out Void) In ... Void))
-              (make-continuation-prompt-tag 'tag)))])]))
+     #`(begin
+         (begin-for-syntax
+           (define name #'T))
+         (define name : #,(tag-type #'T)
+           (make-continuation-prompt-tag 'tag)))]))
 (effect log : (-> Number Number))
+
 
 (define-syntax define/eff
   (syntax-parser
@@ -25,7 +41,7 @@
        (stx-map (λ (e)
                   (define sign (eval e))
                   #`[#,e : #,sign]) #'(eff* ...)))
-     #`(define ((f #,@bind*) [x : T] ...) : T_out
+     #`(define ((f [x : T] ...) #,@bind*) : T_out
          body* ... body)]))
 (define/eff (f [x : String]) : Void { log }
   (println 1)
@@ -34,29 +50,37 @@
   (println (log 4))
   (println 5))
 
-(require/typed racket/control
-               [abort/cc
-                ((Prompt-Tagof Any (-> (-> Number Void) Number Void))
-                 (-> Number Void)
-                 Number
-                 -> Void)]
-               [call/prompt
-                ((-> Void)
-                 (Prompt-Tagof Any (-> (-> Number Void) Number Void))
-                 (-> (-> Number Void) Number Void)
-                 -> Void)])
 
+(define-syntax with-eff
+  (syntax-parser
+    [(_ [tag handler]
+        body:expr)
+     (define t (eval #'tag))
+     (define x* (generate-temporaries (in-type* t)))
+     (define bind* (stx-map (λ (x t) #`[#,x : #,t]) x* (in-type* t)))
+     #`(begin
+         (require/typed racket/control
+                        [abort/cc
+                         (#,(tag-type t)
+                          #,(resume-type t)
+                          #,@(in-type* t)
+                          -> Void)]
+                        [call/prompt
+                         ((-> Void)
+                          #,(tag-type t)
+                          (-> #,(resume-type t) #,@(in-type* t) Void)
+                          -> Void)])
+         (let ([wrapper (λ (#,@bind*)
+                              (cast
+                               (call/cc (λ ([k : #,(resume-type t)])
+                                          (abort/cc log k #,@x*)))
+                               #,(out-type t)))])
+           (call/prompt (λ () (body wrapper))
+                        tag
+                        handler)))]))
 
-(let ([log-wrapper (λ ([n : Number])
-                     (cast
-                      (call/cc (λ ([k : (-> Number Void)])
-                                 (abort/cc log k n)))
-                      Number))])
-  (call/prompt (λ () ((f log-wrapper) "Hello"))
-               log
-               (λ ([resume : (-> Number Void)]
+(with-eff [log (λ ([resume : (-> Number Void)]
                    [v : Number]) : Void
                  (println v)
-                 (resume 10))
-               )
-  )
+                 (resume 10))]
+  (f "Hello"))
