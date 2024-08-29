@@ -28,13 +28,13 @@
          (begin-for-syntax
            (define name #'T))
          (define name : #,(tag-type #'T)
-           (make-continuation-prompt-tag 'tag)))]))
+           (make-continuation-prompt-tag '#,(syntax->datum #'name))))]))
 
 (define-syntax define/eff
   (syntax-parser
     #:datum-literals (:)
     [(_ (f:id [x:id : T] ...) : T_out {eff*:id ...}
-        body*:expr ...+ body:expr)
+        body*:expr ... body:expr)
      (define bind*
        (stx-map (λ (e)
                   (define sign (eval e))
@@ -62,17 +62,16 @@
                           (-> #,(resume-type t) #,@(in-type* t) Void)
                           -> Void)])
          (let ([wrapper (λ (#,@bind*)
-                              (cast
-                               (call/cc (λ ([k : #,(resume-type t)])
-                                          (abort/cc log k #,@x*)))
-                               #,(out-type t)))])
+                          (cast
+                           (call/cc (λ ([k : #,(resume-type t)])
+                                      (abort/cc tag k #,@x*)))
+                           #,(out-type t)))])
            (call/prompt (λ () (body wrapper))
                         tag
                         handler)))]))
 
 
 (effect log : (-> String Void))
-
 (define/eff (f [x : String]) : Void { log }
   (log "1")
   (log "2")
@@ -83,3 +82,12 @@
                  (printf "~a~n" v)
                  (resume (void)))]
   (f "Hello"))
+
+(effect raise : (-> String Void))
+(define/eff (g) : Void { raise }
+  (raise "gg"))
+
+(with-eff [raise (λ ([resume : (-> Void Void)]
+                     [err : String]) : Void
+                   (printf "got error: ~a~n" err))]
+  (g))
