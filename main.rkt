@@ -15,7 +15,7 @@
     (escape 10))
 
   (with-eff/handlers ([escape (λ ([resume : (-> Void Void)]
-                                  [v : Integer])
+                                  [v : Integer]) : Void
                                 (check-equal? v 10)
                                 (void))])
     (f))
