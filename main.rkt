@@ -22,7 +22,7 @@
     (raise "gg")
     (log "world")))
 
-(with-eff/handlers (#;[log (λ ([resume : (-> Void Void)]
+(with-eff/handlers ([log (λ ([resume : (-> Void Void)]
                              [v : String]) : Void
                            (printf "~a~n" v)
                            (resume (void)))]
