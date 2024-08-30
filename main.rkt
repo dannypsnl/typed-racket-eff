@@ -1,7 +1,7 @@
 #lang typed/racket
 (require "arrow-ty.rkt"
          "eff.rkt"
-         "with-eff.rkt")
+         "with-eff-handlers.rkt")
 
 (effect log : (-> String Void))
 (define/eff (f [x : String]) : Void { log }
