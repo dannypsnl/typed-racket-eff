@@ -10,7 +10,7 @@
   (log x))
 (with-eff/handlers ([log (λ ([resume : (-> Void Void)]
                              [v : String]) : Void
-                           (printf "~a~n" v)
+                           (printf "log: ~a~n" v)
                            (resume (void)))])
   (f "msg"))
 
@@ -22,11 +22,15 @@
     (raise "gg")
     (log "world")))
 
-(with-eff/handlers ([log (λ ([resume : (-> Void Void)]
-                             [v : String]) : Void
-                           (printf "~a~n" v)
-                           (resume (void)))]
-                    [raise (λ ([resume : (-> Void Void)]
+(define/eff (h) : Void { raise }
+  (with-eff/handlers ([log (λ ([resume : (-> Void Void)]
+                               [v : String]) : Void
+                             (printf "log(h): ~a~n" v)
+                             (resume (void)))])
+    #:forward { raise }
+    (g)))
+
+(with-eff/handlers ([raise (λ ([resume : (-> Void Void)]
                                [err : String]) : Void
                              (printf "got error: ~a~n" err))])
-  (g))
+  (h))
