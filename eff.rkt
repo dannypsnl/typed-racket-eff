@@ -4,7 +4,8 @@
          define/eff)
 (require "arrow-ty.rkt"
          (for-syntax syntax/parse
-                     syntax/stx))
+                     syntax/stx
+                     racket/syntax))
 
 (define-syntax effect
   (syntax-parser
@@ -19,18 +20,20 @@
   (syntax-parser
     #:datum-literals (:)
     [(_ : T_out {eff*:id ...} body*:expr ... body:expr)
+     (define map-name (generate-temporary 'm))
      (define bind*
        (stx-map (λ (e)
                   (define sign (eval e))
-                  #`[#,e : #,sign]) #'(eff* ...)))
-     #`(λ (#,@bind*) : T_out
-         body* ... body)]))
+                  #`[#,e : #,sign (cast (hash-ref #,map-name '#,e) #,sign)])
+                #'(eff* ...)))
+     #`(λ ([#,map-name : (Mutable-HashTable Symbol Procedure)]) : T_out
+         (let (#,@bind*)
+           body* ... body))]))
 (define-syntax define/eff
   (syntax-parser
     #:datum-literals (:)
     [(_ (f:id [x:id : T] ...) : T_out {eff*:id ...}
         body*:expr ... body:expr)
-
-     #`(define (f [x : T] ...)
+     #'(define (f [x : T] ...)
          (with-eff : T_out {eff* ...}
            body* ... body))]))

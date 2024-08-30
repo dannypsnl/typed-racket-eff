@@ -6,18 +6,18 @@
                      racket/match))
 (require typed/racket/unsafe)
 (unsafe-require/typed racket/control
-               [call/prompt
-                (All (TagTy ResumeTy InTy)
-                     (-> (-> Void)
-                         TagTy
-                         (-> ResumeTy InTy Void)
-                         Void))]
-               [abort/cc
-                (All (TagTy ResumeTy InTy)
-                     (-> TagTy
-                         ResumeTy
-                         InTy
-                         Void))])
+                      [call/prompt
+                       (All (TagTy ResumeTy InTy)
+                            (-> (-> Void)
+                                TagTy
+                                (-> ResumeTy InTy Void)
+                                Void))]
+                      [abort/cc
+                       (All (TagTy ResumeTy InTy)
+                            (-> TagTy
+                                ResumeTy
+                                InTy
+                                Void))])
 
 (define-syntax with-eff/handlers
   (syntax-parser
@@ -32,13 +32,14 @@
              #`({inst call/prompt #,(tag-type t) #,(resume-type t) #,(in-type t)}
                 (λ ()
                   #,(go
-                     (cons #`(λ ([x : #,(in-type t)])
-                               (call/cc (λ ([k : #,(resume-type t)])
-                                          ({inst abort/cc #,(tag-type t) #,(resume-type t) #,(in-type t)} tag k x))))
+                     (cons #`(ann (cons 'tag (λ ([x : #,(in-type t)])
+                                               (call/cc (λ ([k : #,(resume-type t)])
+                                                          ({inst abort/cc #,(tag-type t) #,(resume-type t) #,(in-type t)} tag k x)))))
+                                  (Pairof Symbol Procedure))
                            wrappers)
                      tail))
                 tag
                 handler)])]
-         [_ #`(body #,@wrappers)]))
+         [_ #`(body (make-hash (list #,@wrappers)))]))
 
      (go '() (syntax->list #'([tag handler] ...)))]))

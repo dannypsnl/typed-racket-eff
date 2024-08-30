@@ -4,11 +4,11 @@
          "with-eff.rkt")
 
 (effect log : (-> String Void))
+
 (define/eff (f [x : String]) : Void { log }
   (log "1")
   (log "2")
   (log x))
-
 (with-eff/handlers ([log (λ ([resume : (-> Void Void)]
                              [v : String]) : Void
                            (printf "~a~n" v)
