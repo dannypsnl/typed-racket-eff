@@ -9,17 +9,18 @@
   (log "2")
   (log x))
 
-(with-eff ([log (λ ([resume : (-> Void Void)]
-                    [v : String]) : Void
-                  (printf "~a~n" v)
-                  (resume (void)))])
+(with-eff/handlers ([log (λ ([resume : (-> Void Void)]
+                             [v : String]) : Void
+                           (printf "~a~n" v)
+                           (resume (void)))])
   (f "Hello"))
 
 (effect raise : (-> String Void))
-(define/eff (g) : Void { raise }
-  (raise "gg"))
+(define (g)
+  (with-eff : Void { raise }
+    (raise "gg")))
 
-(with-eff ([raise (λ ([resume : (-> Void Void)]
-                      [err : String]) : Void
-                    (printf "got error: ~a~n" err))])
+(with-eff/handlers ([raise (λ ([resume : (-> Void Void)]
+                               [err : String]) : Void
+                             (printf "got error: ~a~n" err))])
   (g))

@@ -1,5 +1,5 @@
 #lang typed/racket
-(provide with-eff)
+(provide with-eff/handlers)
 (require "arrow-ty.rkt"
          (for-syntax syntax/parse
                      syntax/stx
@@ -19,7 +19,7 @@
                          InTy
                          Void))])
 
-(define-syntax with-eff
+(define-syntax with-eff/handlers
   (syntax-parser
     [(_ ([tag handler] ...)
         body:expr)
