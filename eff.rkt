@@ -20,13 +20,21 @@
   (syntax-parser
     #:datum-literals (:)
     [(_ : T_out {eff*:id ...} body*:expr ... body:expr)
-     (define map-name (generate-temporary 'm))
+     (define obj-name (generate-temporary 'obj))
+     (define sig*
+       (stx-map (λ (e)
+                  (define sign (eval e))
+                  #`[#,e #,sign])
+                #'(eff* ...)))
      (define bind*
        (stx-map (λ (e)
                   (define sign (eval e))
-                  #`[#,e : #,sign (cast (hash-ref #,map-name '#,e) #,sign)])
+                  #`[#,e : #,sign
+                         (λ (x)
+                           (send #,obj-name #,e x))])
                 #'(eff* ...)))
-     #`(λ ([#,map-name : (Mutable-HashTable Symbol Procedure)]) : T_out
+
+     #`(λ ([#,obj-name : (Object #,@sig*)]) : T_out
          (let (#,@bind*)
            body* ... body))]))
 (define-syntax define/eff

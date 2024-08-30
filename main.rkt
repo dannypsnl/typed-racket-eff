@@ -4,7 +4,6 @@
          "with-eff.rkt")
 
 (effect log : (-> String Void))
-
 (define/eff (f [x : String]) : Void { log }
   (log "1")
   (log "2")

@@ -32,14 +32,16 @@
              #`({inst call/prompt #,(tag-type t) #,(resume-type t) #,(in-type t)}
                 (λ ()
                   #,(go
-                     (cons #`(ann (cons 'tag (λ ([x : #,(in-type t)])
-                                               (call/cc (λ ([k : #,(resume-type t)])
-                                                          ({inst abort/cc #,(tag-type t) #,(resume-type t) #,(in-type t)} tag k x)))))
-                                  (Pairof Symbol Procedure))
+                     (cons #`(define/public (tag [x : #,(in-type t)]) : #,(out-type t)
+                               (call/cc (λ ([k : #,(resume-type t)])
+                                          ({inst abort/cc #,(tag-type t) #,(resume-type t) #,(in-type t)} tag k x))))
                            wrappers)
                      tail))
                 tag
                 handler)])]
-         [_ #`(body (make-hash (list #,@wrappers)))]))
+         [_ #`(let ([class% (class object%
+                               (super-new)
+                               #,@wrappers)])
+                (body (new class%)))]))
 
      (go '() (syntax->list #'([tag handler] ...)))]))
