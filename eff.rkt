@@ -26,17 +26,16 @@
                   (define sign (eval e))
                   #`[#,e #,sign])
                 #'(eff* ...)))
-     (define bind*
+     (define def*
        (stx-map (λ (e)
                   (define sign (eval e))
-                  #`[#,e : #,sign
-                         (λ (x)
-                           (send #,obj-name #,e x))])
+                  #`(define (#,e [x : #,(in-type sign)]) : #,(out-type sign)
+                      (send #,obj-name #,e x)))
                 #'(eff* ...)))
 
      #`(λ ([#,obj-name : (Object #,@sig*)]) : T_out
-         (let (#,@bind*)
-           body* ... body))]))
+         #,@def*
+         body* ... body)]))
 (define-syntax define/eff
   (syntax-parser
     #:datum-literals (:)
