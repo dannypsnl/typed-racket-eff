@@ -42,11 +42,28 @@ then end. If we remove `[log ...]` from `with-eff/handlers`, the type checker wi
    /Applications/Racket v8.12/share/pkgs/typed-racket-lib/typed-racket/typed-racket.rkt:22:4
 ```
 
-As desired behaviour of an effect system.
+as desired behaviour of an effect system.
+
+## Forward effect
+
+If you don't want to handle an effect immediately, use `#:forward` (assuming `f` use `log` and `raise`)
+
+```racket
+(define/eff (g) : Void { raise }
+  (with-eff/handlers ([raise #:forward]
+                      [log (λ ([resume : (-> Void Void)]
+                               [v : String]) : Void
+                             (printf "log(g): ~a~n" v)
+                             (resume (void)))])
+    (f)))
+```
+
+The function `g` handle the `log` effect, and let `f` use it's `raise`.
 
 ## Details
 
 The program
+
 1. use `call/prompt` to insert prompt tag
 2. `call/cc` in `f` captures the current continuation as `k`
 3. `abort/cc` forward a value and `k` as `resume` to handler of tag
