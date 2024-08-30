@@ -34,7 +34,7 @@
         body:expr)
      (define (go wrappers l)
        (match l
-         [(cons h t)
+         [(cons h tail)
           (syntax-parse h
             [(tag handler)
              (define t (eval #'tag))
@@ -58,7 +58,7 @@
                                                  (call/cc (λ ([k : #,(resume-type t)])
                                                             (abort/cc tag k #,@x*)))
                                                  #,(out-type t))) wrappers)
-                                      t))
+                                      tail))
                               tag
                               handler))])]
          [_ #`(body #,@wrappers)]))
