@@ -1,8 +1,18 @@
 # typed/racket + eff
 
-The project integrate effect/handler system with typed/racket, the basic example is
+The project integrate effect/handler system with [typed/racket](https://docs.racket-lang.org/ts-reference/index.html).
+
+## Installation
+
+```sh
+raco pkg install typed-racket-eff
+```
+
+## Example
 
 ```racket
+(require typed-racket-eff)
+
 (effect log : (-> String Void))
 (effect raise : (-> String Void))
 
