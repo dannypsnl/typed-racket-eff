@@ -1,7 +1,8 @@
 #lang info
 (define collection "typed-racket-eff")
 (define deps '("base"
-               "typed-racket-lib"))
+               "typed-racket-lib"
+               "type-expander"))
 (define build-deps '("scribble-lib" "racket-doc" "rackunit-typed"))
 (define scribblings '(("scribblings/typed-racket-eff.scrbl" ())))
 (define pkg-desc "Description Here")

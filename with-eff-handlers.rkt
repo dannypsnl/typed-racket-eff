@@ -8,21 +8,21 @@
 (require typed/racket/unsafe)
 (unsafe-require/typed racket/control
                       [call/prompt
-                       (All (TagTy ResumeTy InTy)
-                            (-> (-> Void)
+                       (All (TagTy ResumeTy InTy Out)
+                            (-> (-> Out)
                                 TagTy
-                                (-> ResumeTy InTy Void)
-                                Void))]
+                                (-> ResumeTy InTy Out)
+                                Out))]
                       [abort/cc
-                       (All (TagTy ResumeTy InTy)
+                       (All (TagTy ResumeTy InTy OutTy)
                             (-> TagTy
                                 ResumeTy
                                 InTy
-                                Void))])
+                                OutTy))])
 
 (define-syntax with-eff/handlers
   (syntax-parser
-    [(_ ([tag handler] ...) body:expr)
+    [(_ ([tag:id handler] ...) body:expr)
      (define (go rename-eff wrappers l)
        (match l
          [(cons h tail)
@@ -45,7 +45,7 @@
                      (cons #`(define/public (tag [x : #,(in-type t)]) : #,(out-type t)
                                (call/cc
                                 (λ ([k : #,(resume-type t)])
-                                  ({inst abort/cc #,(tag-type t) #,(resume-type t) #,(in-type t)}
+                                  ({inst abort/cc #,(tag-type t) #,(resume-type t) #,(in-type t) #,(out-type t)}
                                    #,eff k x))))
                            wrappers)
                      tail))
