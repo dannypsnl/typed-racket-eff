@@ -28,22 +28,6 @@
          body* ... body)]))
 
 
-(define-syntax (with stx)
-  (syntax-parse stx
-    [(_ (~seq [tag handler] ...)
-        body:expr)
-     (define (go l)
-       (match l
-         [(cons h t)
-          (syntax-parse h
-            [(tag handler)
-             #`(call/prompt (λ () #,(go t))
-                            tag
-                            handler)])]
-         [_ #'body]))
-
-     (go (syntax->list #'((tag handler) ...)))]))
-
 (define-syntax with-eff
   (syntax-parser
     [(_ ([tag handler] ...)
