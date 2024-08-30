@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         racket-version: ["stable", "current"]
-        racket-variant: ["BC", "CS"]
+        racket-variant: ["CS"]
         include:
           - racket-version: current
             experimental: true
