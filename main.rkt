@@ -1,38 +1,16 @@
 #lang typed/racket
 (require (for-syntax syntax/parse
                      syntax/stx
-                     racket/match))
-
-(begin-for-syntax
-  (define (tag-type T)
-    (syntax-parse T
-      #:datum-literals (->)
-      [(-> In ... Out)
-       #'(Prompt-Tagof Any
-                       (-> (-> Out Void) In ... Void))]))
-  (define (resume-type T)
-    (syntax-parse T
-      #:datum-literals (->)
-      [(-> In ... Out)
-       #'(-> Out Void)]))
-  (define (in-type* T)
-    (syntax-parse T
-      #:datum-literals (->)
-      [(-> In ... Out)
-       #'(In ...)]))
-  (define (out-type T)
-    (syntax-parse T
-      #:datum-literals (->)
-      [(-> In ... Out)
-       #'Out])))
+                     racket/match
+                     )
+         "arrow-ty.rkt")
 
 (define-syntax effect
   (syntax-parser
     #:datum-literals (:)
     [(_ name:id : T)
      #`(begin
-         (begin-for-syntax
-           (define name #'T))
+         (define-for-syntax name #'T)
          (define name : #,(tag-type #'T)
            (make-continuation-prompt-tag '#,(syntax->datum #'name))))]))
 
