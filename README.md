@@ -60,6 +60,10 @@ If you don't want to handle an effect immediately, use `#:forward` (assuming `f`
 
 The function `g` handle the `log` effect, and let `f` use it's `raise`.
 
+## Limitation
+
+To generate proper `call/prompt` and `abort/cc`, every effect handler can only take one input type, so if you want to transfer several arguments, use structure to wrap them.
+
 ## Details
 
 The program

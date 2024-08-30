@@ -1,6 +1,5 @@
 #lang typed/racket
-(provide with-eff/handlers
-         forward)
+(provide with-eff/handlers)
 (require "arrow-ty.rkt"
          (for-syntax syntax/parse
                      syntax/stx
