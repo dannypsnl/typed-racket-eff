@@ -1,11 +1,30 @@
 #lang typed/racket
-(provide effect
+(provide Eff
+         effs
+         effect
          with-eff
          define/eff)
 (require "arrow-ty.rkt"
+         type-expander
          (for-syntax syntax/parse
                      syntax/stx
                      racket/syntax))
+
+; Usage: (Eff A (effs log raise))
+;
+; this represents a type A use effects log & raise.
+(define-type (Eff A I)
+  (-> I A))
+
+(define-type-expander effs
+  (syntax-parser
+    [(_ eff*:id ...)
+     (define sig*
+       (stx-map (λ (e)
+                  (define sign (eval e))
+                  #`[#,e #,sign])
+                #'(eff* ...)))
+     #`(Object #,@sig*)]))
 
 (define-syntax effect
   (syntax-parser
@@ -21,11 +40,6 @@
     #:datum-literals (:)
     [(_ : T_out {eff*:id ...} body*:expr ... body:expr)
      (define obj-name (generate-temporary 'obj))
-     (define sig*
-       (stx-map (λ (e)
-                  (define sign (eval e))
-                  #`[#,e #,sign])
-                #'(eff* ...)))
      (define def*
        (stx-map (λ (e)
                   (define sign (eval e))
@@ -33,7 +47,7 @@
                       (send #,obj-name #,e x)))
                 #'(eff* ...)))
 
-     #`(λ ([#,obj-name : (Object #,@sig*)]) : T_out
+     #`(λ ([#,obj-name : (effs eff* ...)]) : T_out
          #,@def*
          body* ... body)]))
 (define-syntax define/eff
