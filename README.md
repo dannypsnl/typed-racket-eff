@@ -72,45 +72,33 @@ The function `g` handle the `log` effect, and let `f` use it's `raise`.
 
 ## Limitation
 
-1. To generate proper `call/prompt` and `abort/cc`, every effect handler can only take one input type, so if you want to transfer several arguments, use structure to wrap them.
-2. Higher-order
+To generate proper `call/prompt` and `abort/cc`, every effect handler can only take one input type, so if you want to transfer several arguments, use structure to wrap them.
 
 ### Higher-order
 
-You can do something like below, but it's very hard to be correct.
+The higher-order effect can be done by use `Eff` type and `eff` object, then by pass current `eff` object to the invoked function, but the API is still sharp, it's easy to forget `(λ (args ...) ((f args ...) eff))` pattern.
 
 ```racket
-#lang typed/racket
-(require typed-racket-eff)
+(effect number-to-string : (-> Number String))
 
-(effect log : (-> String Void))
-(define/eff (f [msg : String]) : Void { log }
-  (log msg))
+(define/eff (f [x : Number]) : String { number-to-string }
+  (number-to-string x))
 
-(define/eff (high) : Void { log }
-  (map (λ ([x : String])
-         (with-eff/handlers ([log #:forward])
-           (f x)))
-       (list "hi"))
-  (void))
+(: emap : (All (I A B)
+               (-> (-> A (Eff B I))
+                   (Listof A)
+                   (Eff (Listof B) I))))
+(define (emap f l)
+  (λ (eff)
+    (#{map @ B A} (λ (x) ((f x) eff)) l)))
 
-(with-eff/handlers ([log (λ ([resume : (-> Void Void)]
-                             [msg : String])
-                           (printf "~a~n" msg)
-                           (resume (void)))])
-  (high))
-
-(map (λ ([x : String])
-       (with-eff/handlers ([log (λ ([resume : (-> Void Void)]
-                                    [msg : String])
-                                  (printf "~a~n" msg)
-                                  (resume (void)))])
-
-         (f x)))
-     (list "hi"))
+(with-eff/handlers ([number-to-string
+                     (λ ([resume : (-> String Void)]
+                         [v : Number])
+                       (resume (format "~a" v)))])
+  (emap f
+        (list 1 2 3)))
 ```
-
-This is because I use lambda that expected an object to represent a type with effects.
 
 ## Details
 
