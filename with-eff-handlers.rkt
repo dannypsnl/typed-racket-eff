@@ -59,8 +59,3 @@
                 (body (new class%)))]))
 
      (go '() '() (syntax->list #'([tag handler] ...)))]))
-
-(define-syntax forward
-  (syntax-parser
-    [(_ (eff* ...) body:expr)
-     #'(with-eff/handlers ([eff* eff*] ...) body)]))
