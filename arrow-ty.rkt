@@ -1,7 +1,7 @@
 #lang typed/racket
 (provide (for-syntax tag-type
                      resume-type
-                     in-type*
+                     in-type
                      out-type))
 (require (for-syntax syntax/parse))
 
@@ -9,21 +9,21 @@
   (define (tag-type T)
     (syntax-parse T
       #:datum-literals (->)
-      [(-> In ... Out)
+      [(-> In Out)
        #'(Prompt-Tagof Any
-                       (-> (-> Out Void) In ... Void))]))
+                       (-> (-> Out Void) In Void))]))
   (define (resume-type T)
     (syntax-parse T
       #:datum-literals (->)
-      [(-> In ... Out)
+      [(-> In Out)
        #'(-> Out Void)]))
-  (define (in-type* T)
+  (define (in-type T)
     (syntax-parse T
       #:datum-literals (->)
-      [(-> In ... Out)
-       #'(In ...)]))
+      [(-> In Out)
+       #'In]))
   (define (out-type T)
     (syntax-parse T
       #:datum-literals (->)
-      [(-> In ... Out)
+      [(-> In Out)
        #'Out])))
