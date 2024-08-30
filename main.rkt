@@ -23,11 +23,11 @@
     (log "world")))
 
 (define/eff (h) : Void { raise }
-  (with-eff/handlers ([log (λ ([resume : (-> Void Void)]
+  (with-eff/handlers ([raise #:forward]
+                      [log (λ ([resume : (-> Void Void)]
                                [v : String]) : Void
                              (printf "log(h): ~a~n" v)
                              (resume (void)))])
-    #:forward { raise }
     (g)))
 
 (with-eff/handlers ([raise (λ ([resume : (-> Void Void)]
