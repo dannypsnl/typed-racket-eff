@@ -72,7 +72,45 @@ The function `g` handle the `log` effect, and let `f` use it's `raise`.
 
 ## Limitation
 
-To generate proper `call/prompt` and `abort/cc`, every effect handler can only take one input type, so if you want to transfer several arguments, use structure to wrap them.
+1. To generate proper `call/prompt` and `abort/cc`, every effect handler can only take one input type, so if you want to transfer several arguments, use structure to wrap them.
+2. Higher-order
+
+### Higher-order
+
+You can do something like below, but it's very hard to be correct.
+
+```racket
+#lang typed/racket
+(require typed-racket-eff)
+
+(effect log : (-> String Void))
+(define/eff (f [msg : String]) : Void { log }
+  (log msg))
+
+(define/eff (high) : Void { log }
+  (map (λ ([x : String])
+         (with-eff/handlers ([log #:forward])
+           (f x)))
+       (list "hi"))
+  (void))
+
+(with-eff/handlers ([log (λ ([resume : (-> Void Void)]
+                             [msg : String])
+                           (printf "~a~n" msg)
+                           (resume (void)))])
+  (high))
+
+(map (λ ([x : String])
+       (with-eff/handlers ([log (λ ([resume : (-> Void Void)]
+                                    [msg : String])
+                                  (printf "~a~n" msg)
+                                  (resume (void)))])
+
+         (f x)))
+     (list "hi"))
+```
+
+This is because I use lambda that expected an object to represent a type with effects.
 
 ## Details
 
