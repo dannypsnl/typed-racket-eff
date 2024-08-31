@@ -41,15 +41,8 @@ failed
 then end. If we remove `[log ...]` from `with-eff/handlers`, the type checker will complain
 
 ```
- object lacks expected method `log'
-  in: #%module-begin
-  location...:
-   main.rkt:1:6
-  context...:
-   /Applications/Racket v8.12/share/pkgs/typed-racket-lib/typed-racket/typecheck/tc-toplevel.rkt:481:0: type-check
-   .../private/parse-interp.rkt:643:50
-   /Applications/Racket v8.12/share/pkgs/typed-racket-lib/typed-racket/tc-setup.rkt:115:12
-   /Applications/Racket v8.12/share/pkgs/typed-racket-lib/typed-racket/typed-racket.rkt:22:4
+Type Checker: type mismatch;
+ object lacks expected method `log' in: (with-eff/handlers ((raise (λ ((resume : (-> Void Void)) (err : String)) : Void (printf "got error: ~a~n" err)))) (f))
 ```
 
 as desired behaviour of an effect system.
