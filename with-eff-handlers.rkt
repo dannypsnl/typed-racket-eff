@@ -20,8 +20,8 @@
                                 InTy
                                 OutTy))])
 
-(define-syntax with-eff/handlers
-  (syntax-parser
+(define-syntax (with-eff/handlers stx)
+  (syntax-parse stx
     [(_ ([tag:id handler] ...) body:expr)
      (define (go rename-eff wrappers l)
        (match l
@@ -51,10 +51,11 @@
                      tail))
                 tag
                 handler)])]
-         [_ #`(let* (#,@rename-eff
+         [_ (quasisyntax/loc stx
+              (let* (#,@rename-eff
                      [class% (class object%
                                (super-new)
                                #,@wrappers)])
-                (body (new class%)))]))
+                (body (new class%))))]))
 
      (go '() '() (syntax->list #'([tag handler] ...)))]))
