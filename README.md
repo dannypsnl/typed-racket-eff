@@ -48,7 +48,7 @@ Type Checker: type mismatch;
 
 as desired behaviour of an effect system.
 
-## Forward effect
+### Forward effect
 
 If you don't want to handle an effect immediately, use `#:forward` (assuming `f` use `log` and `raise`)
 
@@ -63,6 +63,24 @@ If you don't want to handle an effect immediately, use `#:forward` (assuming `f`
 ```
 
 The function `g` handle the `log` effect, and let `f` use it's `raise`.
+
+### Finally
+
+Use `#:finally` handler to ensure something will run after `body` clause.
+
+```racket
+(effect fread : (-> Void String))
+
+(define/eff (f) : Void { fread }
+  (println (fread (void))))
+
+(define in (open-input-file "file.rkt"))
+(with-eff/handlers ([fread (λ ([resume : (-> String Void)]
+                               [_ : Void])
+                             (read-line in))])
+  #:finally (λ () (close-input-port in))
+  (f))
+```
 
 ## Limitation
 
