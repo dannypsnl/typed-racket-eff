@@ -22,7 +22,9 @@
 
 (define-syntax (with-eff/handlers stx)
   (syntax-parse stx
-    [(_ ([tag:id handler] ...) body:expr)
+    [(_ ([tag:id handler] ...)
+        (~optional (~seq #:finally final-handler))
+        body:expr)
      (define (go rename-eff wrappers l)
        (match l
          [(cons h tail)
@@ -58,4 +60,11 @@
                                #,@wrappers)])
                 (body (new class%))))]))
 
-     (go '() '() (syntax->list #'([tag handler] ...)))]))
+     (define r (go '() '() (syntax->list #'([tag handler] ...))))
+     
+     (if (attribute final-handler)
+         #`(dynamic-wind
+              void
+              (λ () #,r)
+              final-handler)
+         r)]))
