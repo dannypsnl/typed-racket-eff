@@ -11,6 +11,7 @@ raco pkg install typed-racket-eff
 ## Example
 
 ```racket
+#lang typed/racket
 (require typed-racket-eff)
 
 (effect log : (-> String Void))
