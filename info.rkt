@@ -3,7 +3,11 @@
 (define deps '("base"
                "typed-racket-lib"
                "type-expander"))
-(define build-deps '("scribble-lib" "racket-doc" "rackunit-typed"))
+(define build-deps '("scribble-lib"
+                     "rackunit-typed"
+                     "typed-racket-doc"
+                     "racket-doc"
+                     ))
 (define scribblings '(("scribblings/typed-racket-eff.scrbl" ())))
 (define pkg-desc "Description Here")
 (define version "0.0")
