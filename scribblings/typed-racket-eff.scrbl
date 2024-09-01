@@ -9,6 +9,6 @@
 
 typed/racket + effect system, The project integrate an effect system into typed/racket.
 
-@include-section["guide"]
-@include-section["api"]
-@include-section["limitation"]
+@include-section["guide.scrbl"]
+@include-section["api.scrbl"]
+@include-section["limitation.scrbl"]
