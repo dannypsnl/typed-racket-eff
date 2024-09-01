@@ -1,14 +1,29 @@
 #lang typed/racket
-(provide Eff
-         effs
+(provide Eff effs
          effect
+         effect-out
          with-eff
          define/eff)
 (require "arrow-ty.rkt"
          type-expander
          (for-syntax syntax/parse
+                     racket/provide-transform
                      syntax/stx
                      racket/syntax))
+
+(define-syntax effect-out
+  (make-provide-transformer
+   (lambda (stx modes)
+     (unless (or (null? modes)
+                 (equal? '(0) modes))
+       (raise-syntax-error
+        #f
+        "allowed only for relative phase level 0"
+        stx))
+     (syntax-parse stx
+       [(_ eff:id)
+        (list (export #'eff #'eff 0 #f #'eff)
+              (export #'eff #'eff 1 #f #'eff))]))))
 
 ; Usage: (Eff A (effs log raise))
 ;

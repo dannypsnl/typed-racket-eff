@@ -1,5 +1,5 @@
 #lang typed/racket
-(provide effect
+(provide effect effect-out
          Eff effs
          define/eff
          with-eff
