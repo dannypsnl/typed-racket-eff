@@ -82,10 +82,6 @@ Use `#:finally` handler to ensure something will run after `body` clause.
   (f))
 ```
 
-## Limitation
-
-To generate proper `call/prompt` and `abort/cc`, every effect handler can only take one input type, so if you want to transfer several arguments, use structure to wrap them.
-
 ### Higher-order
 
 The higher-order effect can be done by use `Eff` type and `eff` object, then by pass current `eff` object to the invoked function, but the API is still sharp, it's easy to forget `(λ (args ...) ((f args ...) eff))` pattern.
