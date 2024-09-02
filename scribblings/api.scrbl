@@ -30,7 +30,7 @@
       body* ... body))
  ]
  @defsubform[(with-eff : T_out { e* ... } body* ... body)]{
-  Create a lambda with type @code{Eff T_out (effs e* ...)}, and with body @code{body* ... body},
+  Create a lambda with type @code{(Eff T_out (effs e* ...))}, and with body @code{body* ... body},
   i.e.
   @racketblock[
   (: (Eff T_out (effs e* ...)))
