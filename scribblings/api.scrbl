@@ -57,11 +57,11 @@
 
  (with-eff/handlers ([log (λ ([resume : (-> Void Void)]
                               [v : String]) : Void
-                             (printf "~a~n" v)
-                             (resume (void)))]
+                            (printf "~a~n" v)
+                            (resume (void)))]
                      [raise (λ ([resume : (-> Void Void)]
                                 [err : String]) : Void
-                             (printf "got error: ~a~n" err))])
+                              (printf "got error: ~a~n" err))])
    (f))
  ]
 }
