@@ -82,7 +82,7 @@ but the API is still sharp, it's easy to forget the pattern
                    (Eff (Listof B) I))))
 (define (emap f l)
   (λ (eff)
-    (#{map \@ B A} (λ (x) ((f x) eff)) l)))
+    ({inst map B A} (λ (x) ((f x) eff)) l)))
 
 (with-eff/handlers ([number-to-string
                      (λ ([resume : (-> String Void)]
