@@ -30,7 +30,17 @@
       body* ... body))
  ]
  @defsubform[(with-eff : T_out { e* ... } body* ... body)]{
-  Create a lambda with type @code{Eff T_out (effs e* ...)}, and with body @code{body* ... body}.
+  Create a lambda with type @code{Eff T_out (effs e* ...)}, and with body @code{body* ... body},
+  i.e.
+  @racketblock[
+  (: (Eff T_out (effs e* ...)))
+  (lambda (eff) body* ... body)
+  ]
+  This macro also bind a list of function to wrap @code{eff} object, e.g.
+  @racketblock[
+  (define (raise err) (send eff raise err))
+  ]
+  so you can invoke effect just like usual function.
  }
 }
 
