@@ -29,6 +29,13 @@
        (match l
          [(cons h tail)
           (syntax-parse h
+            [(tag (#:forward eff-obj))
+             (define t (eval #'tag))
+             (go rename-eff
+                 (cons #`(define/public (tag [x : #,(in-type t)]) : #,(out-type t)
+                           (send eff-obj tag x))
+                       wrappers)
+                 tail)]
             [(tag #:forward)
              (define forward (generate-temporary #'forward))
              (define t (eval #'tag))
