@@ -1,6 +1,6 @@
 # typed/racket + eff
 
-The project integrate effect/handler system with [typed/racket](https://docs.racket-lang.org/ts-reference/index.html), read the [racket document](https://docs.racket-lang.org/typed-racket-eff/index.html) to get usage and APIs information.
+The project integrates effect/handler system with [typed/racket](https://docs.racket-lang.org/ts-reference/index.html), read the [document](https://docs.racket-lang.org/typed-racket-eff/index.html) to get usage and APIs information.
 
 ## Installation
 
