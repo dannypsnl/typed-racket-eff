@@ -3,9 +3,11 @@
          Eff effs
          define/eff
          with-eff
-         with-eff/handlers)
+         with-eff/handlers
+         fun)
 (require "eff.rkt"
-         "with-eff-handlers.rkt")
+         "with-eff-handlers.rkt"
+         "handler.rkt")
 
 (module+ test
   (require typed/rackunit)
