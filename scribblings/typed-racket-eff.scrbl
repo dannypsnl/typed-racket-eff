@@ -7,7 +7,7 @@
 
 @defmodule[typed-racket-eff]
 
-The project integrate an effect system into typed/racket.
+The project integrates an effect system into typed/racket.
 
 @include-section["guide.scrbl"]
 @include-section["api.scrbl"]
